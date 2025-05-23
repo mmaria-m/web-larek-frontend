@@ -200,3 +200,9 @@ interface ISuccessView {
 **Методы:**
 - `set valid()`
 - `set error()`
+
+### Presenter
+
+#### AppPresenter
+
+**Назначение:** координация между Model и View.
