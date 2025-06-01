@@ -16,7 +16,7 @@ export abstract class Component<T> {
 	}
 
 	setDisabled(element: HTMLElement, state: boolean) {
-		element.toggleAttribute('disabled', state); //???????
+		element.toggleAttribute('disabled', state); 
 	}
 
 	protected setHidden(element: HTMLElement) {
@@ -24,7 +24,7 @@ export abstract class Component<T> {
 	}
 
 	protected setVisible(element: HTMLElement) {
-		element.style.display = ''; ///???????
+		element.style.display = ''; 
 	}
 
 	protected setImage(element: HTMLImageElement, src: string, alt?: string) {

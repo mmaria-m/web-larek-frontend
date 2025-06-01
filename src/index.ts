@@ -3,25 +3,27 @@ import './scss/styles.scss';
 import { WebLarekApi } from './components/WebLarekApi';
 import { API_URL, CDN_URL } from './utils/constants';
 import { EventEmitter } from './components/base/events';
-import { BasketModel, ProductListModel } from './components/model/AppData';
+import { BasketModel } from './components/model/BasketModel';
+import { ProductListModel } from './components/model/ProductListModel';
 import { CardView } from './components/view/CardView';
 import { ModalView } from './components/view/ModalView';
 import { ensureElement, cloneTemplate } from './utils/utils';
 import { IItem } from './types';
 import { BasketView } from './components/view/BasketView';
 import { IForm } from './types';
-import { FormView } from './components/view/FormView';
+import { OrderFormView, ContactsFormView } from './components/view/FormView';
 import { SuccessView } from './components/view/SuccessView';
-import { IOrder } from './types';
+import { OrderModel } from './components/model/OrderModel';
 
 // Инициализация
 const api = new WebLarekApi(CDN_URL, API_URL);
 const events = new EventEmitter();
 const productListModel = new ProductListModel({}, events);
-const basketModel = new BasketModel({}, events);
+const basketModel = new BasketModel({}, events, productListModel);
 const modalContainer = ensureElement<HTMLElement>('#modal-container');
 const modal = new ModalView(modalContainer, events);
 const cardGallery = ensureElement<HTMLElement>('.gallery');
+const orderModel = new OrderModel({}, events);
 
 // Загрузка списка товаров
 api.getItemsList().then((items) => {
@@ -110,23 +112,24 @@ events.on('basket:remove', (item: IItem) => {
 	basketModel.removeFromBasket(item);
 });
 
-// Обработка заказа
-const orderData: Partial<IOrder> = {};
 
 events.on('basket:order', () => {
-	if (
-		modal.container.classList.contains('modal_active') &&
-		modal.container.querySelector('.form')
-	) {
-		return;
-	}
-	const orderElement = cloneTemplate('#order');
-	const formView = new FormView(orderElement, events);
-	modal.open(orderElement);
+    if (
+        modal.container.classList.contains('modal_active') &&
+        modal.container.querySelector('.form')
+    ) {
+        return;
+    }
+    const orderElement = cloneTemplate('#order');
+    const orderFormView = new OrderFormView(orderElement, events);
+    modal.open(orderElement);
 });
 
-// Валидация формы доставки/оплаты
+// Валидация формы адреса/оплаты
 events.on('order:change', (data: IForm) => {
+	orderModel.setOrderData(data);
+    const order = orderModel.getOrder();
+
 	const paymentSelected = !!data.paymentMethod;
 	const addressFilled = !!data.address && data.address.trim().length > 0;
 	const formView = modal.container.querySelector('.form') as HTMLElement;
@@ -143,20 +146,20 @@ events.on('order:change', (data: IForm) => {
 
 // Переход к форме контактов
 events.on('order:submit', (data: IForm) => {
-	orderData.payment = data.paymentMethod;
-	orderData.address = data.address;
-
+    orderModel.setOrderData(data);
+    const order = orderModel.getOrder();
 	if (data.paymentMethod && data.address) {
 		const contactsElement = cloneTemplate('#contacts');
-		const formView = new FormView(contactsElement, events, true);
+		const contactsFormView = new ContactsFormView(contactsElement, events);
 		modal.open(contactsElement);
 	}
 });
 
 // Валидация формы контактов
 events.on('contacts:change', (data: IForm) => {
-	orderData.email = data.email;
-	orderData.phone = data.phone;
+orderModel.setOrderData(data);
+    const order = orderModel.getOrder();
+    console.log('Contacts changed:', order);
 
 	const emailFilled = !!data.email && data.email.trim().length > 0;
 	const phoneFilled = !!data.phone && data.phone.trim().length > 0;
@@ -175,37 +178,29 @@ events.on('contacts:change', (data: IForm) => {
 
 // Отправка заказа
 events.on('contacts:submit', async (data: IForm) => {
-	orderData.email = data.email;
-	orderData.phone = data.phone;
-
-	orderData.total = basketModel.getBasket().total || 0;
+	const basket = basketModel.getBasket();
+	orderModel.setOrderData({
+		...data,
+		items: basket.items,
+		total: basket.total
+	});
+    const order = orderModel.getOrder();
 
 	if (
-		orderData.email &&
-		orderData.phone &&
-		orderData.payment &&
-		orderData.address
+order.email &&
+        order.phone &&
+        order.payment &&
+        order.address
 	) {
 		try {
-			const order: IOrder = {
-				payment: orderData.payment!,
-				address: orderData.address!,
-				email: orderData.email,
-				phone: orderData.phone,
-				items: basketModel.getBasket().items,
-				total: basketModel.getBasket().total,
-			};
-
+ console.log('Submitting order:', order);
 			const result = await api.submitOrder(order);
 			const successElement = cloneTemplate('#success');
 			const successView = new SuccessView(successElement, events);
 			successView.total = result.total;
 			modal.open(successElement);
 			basketModel.clearBasket();
-			orderData.payment = undefined;
-			orderData.address = undefined;
-			orderData.email = undefined;
-			orderData.phone = undefined;
+			orderModel.clearOrder();
 			const basketButtonCounter = ensureElement<HTMLElement>(
 				'.header__basket-counter'
 			);

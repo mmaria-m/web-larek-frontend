@@ -60,6 +60,9 @@ export class CardView extends Component<IItem> {
 
 	set price(value: number | null) {
 		this.setText(this._price, value ? `${value} синапсов` : 'Бесценно');
+		if (this._button) {
+			this.setDisabled(this._button, value === null);
+		}
 	}
 
 	set category(value: string) {

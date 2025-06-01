@@ -3,11 +3,13 @@
 Стек: HTML, SCSS, TS, Webpack
 
 Структура проекта:
+
 - src/ — исходные файлы проекта
 - src/components/ — папка с JS компонентами
 - src/components/base/ — папка с базовым кодом
 
 Важные файлы:
+
 - src/pages/index.html — HTML-файл главной страницы
 - src/types/index.ts — файл с типами
 - src/index.ts — точка входа приложения
@@ -16,6 +18,7 @@
 - src/utils/utils.ts — файл с утилитами
 
 ## Установка и запуск
+
 Для установки и запуска проекта необходимо выполнить команды
 
 ```
@@ -29,6 +32,7 @@ npm run start
 yarn
 yarn start
 ```
+
 ## Сборка
 
 ```
@@ -42,95 +46,169 @@ yarn build
 ```
 
 ## Архитектура
-Архитектура основана на паттерне MVP. Т.е. приложение разделено на три слоя: 
-- Model – работает с данными; 
+
+Архитектура основана на паттерне MVP. Т.е. приложение разделено на три слоя:
+
+- Model – работает с данными;
 - View – работает с отображением;
 - Presenter — передает информацию между Model и View. Логика Presenter находится в index.ts.
 
+## Взаимодействие компонентов
+
+Компоненты взаимодействуют через события, реализованные с помощью EventEmitter.
+Model отправляет события при изменении данных (например, catalog:changed, basket:changed, order:changed).
+
+View генерирует события в зависимости от действий пользователя (например, card:select, basket:order, order:submit).
+
+Presenter (index.ts) подписывается на события и координирует взаимодействие, вызывая методы Model и View.
+
+## Ключевые события
+
+- catalog:changed — обновление каталога товаров (источник: ProductListModel).
+
+- basket:changed — изменение корзины.
+
+- basket:remove — удаление товара из корзины.
+
+- basket:order — переход к оформлению заказа.
+
+- order:change — изменение данных формы оплаты/адреса.
+
+- order:submit — отправка формы оплаты/адреса.
+
+- contacts:change — изменение данных формы контактов.
+
+- contacts:submit — отправка заказа на сервер.
+
+- success:closed — закрытие окна об успешном заказе.
+
+- modal:opened — открытие модального окна.
+
+- modal:closed — закрытие модального окна.
+<!--
+
+## Процессы
+
+Все процессы реализованы через события с использованием EventEmitter. Пример процесса добавления товара в корзину:
+
+- Пользователь кликает на кнопку «В корзину» в карточке товара.
+  = CardView вызывает событие card:select с данными товара.
+- Presenter в index.ts обрабатывает событие:
+  - Проверяет, есть ли товар в корзине (BasketModel.hasItem()).
+  - Если товара нет, вызывает BasketModel.addToBasket(item), добавляя товар в корзину.
+  - Если товар уже в корзине, вызывает BasketModel.removeFromBasket(item), удаляя его.
+- BasketModel обновляет список товаров и вызывает событие basket:changed.
+- Presenter обновляет счётчик товаров. -->
+
 ## Типы и интерфесы
+
 Типы и интерфейсы заданы в src/types/index.ts.
 
 #### ProductCategory
+
 Виды категорий товаров
+
 ```ts
-type ProductCategory = 'soft-skill' | 'other' | 'additional' | 'button' | 'hard-skill';
+type ProductCategory =
+	| 'soft-skill'
+	| 'other'
+	| 'additional'
+	| 'button'
+	| 'hard-skill';
 ```
 
 #### PaymentMethod
+
 Возможные методы оплаты заказа
+
 ```ts
-type PaymentMethod = 'online' | 'cash'; 
+type PaymentMethod = 'online' | 'cash';
 ```
 
 #### IItem
+
 Описывает товар из каталога
+
 ```ts
 interface IItem {
-    id: string;
-    description: string;
-    image: string;
-    title: string; 
-    price: number | null;
-    category: ProductCategory;
+	id: string;
+	description: string;
+	image: string;
+	title: string;
+	price: number | null;
+	category: ProductCategory;
 }
 ```
 
 #### IOrder
+
 Описывает заказ пользователя
+
 ```ts
 interface IOrder {
-    payment: PaymentMethod;
-    email: string;
-    phone: string;
-    address: string;
-    total: number;
-    items: string[];
+	payment: PaymentMethod;
+	email: string;
+	phone: string;
+	address: string;
+	total: number;
+	items: string[];
 }
 ```
 
 #### IBasket
+
 Описывает список товаров в корзине и их общую стоимость
+
 ```ts
 interface IBasket {
-    items: string[];
-    total: number;
-
+	items: string[];
+	total: number;
 }
 ```
+
 #### IForm
+
 Данные, которые пользователь вводит при оформлении заказа
+
 ```ts
 interface IForm {
-    paymentMethod?: PaymentMethod;
-    address?: string;
-    email?: string;
-    phone?: string;
+	paymentMethod?: PaymentMethod;
+	address?: string;
+	email?: string;
+	phone?: string;
 }
 ```
 
 #### ISuccessView
+
 Данные для окна удачного офорления заказа
+
 ```ts
 interface ISuccessView {
-    total: number;
+	total: number;
 }
 ```
 
 ## Классы
 
 ### Базовые
+
 #### API
+
 **Назначение:** взаимодействие с сервером.
 
-**Методы:** 
+**Методы:**
+
 - `handleResponse` — обрабатывает ответы.
 - `get` – отправляет запрос на сервер и получает ответ.
 - `post` – отправляет данные на сервер.
 
 #### EventEmitter
+
 **Назначение:** организация работы с событиями.
 
 **Методы:**
+
 - `on` – добавлят обработчик события.
 - `off` – убирает обработчик события.
 - `emit` – вызывает событие.
@@ -138,51 +216,95 @@ interface ISuccessView {
 - `ofAll` — снимает обработчик со всех событий.
 
 #### Component
+
 **Назначение:** базовый класс для компонентов отображения.
 
+**Методы:**
+
+- `toggleClass()` — переключает класс.
+- `etText()` — устанавливает текст.
+- `setDisabled()` — управляет disabled.
+- `setHidden()` — скрывает элемент.
+- `setVisible()` — показывает элемент.
+- `setImage()` — устанавливает изображение.
+- `render()` — рендерит компонент.
+
 #### Model
+
 **Назначение:** базовый класс для моделей данных.
+
+**Методы:**
+
+- `emitChanges()` — вызывает событие.
 
 ### Model
 
 #### ProductListModel
+
 **Назначение:** логика работы с товарами.
 
-**Поля:** 
+**Поля:**
+
 - `items` – хранит массив товаров.
 
 **Методы:**
+
 - `setProducts()` – заполняет массив товаров данными.
+- `get items()` – получает товары из модели.
+- `getProduct()` - возвращает товар.
 
 #### BasketModel
-**Назначение:** логика работы с товарами, добавленными в корзину. 
 
-**Поля:** 
+**Назначение:** логика работы с товарами, добавленными в корзину.
+
+**Поля:**
+
 - `items` — хранит массив товаров.
-- `total` – сумма к оплате.
 
 **Методы:**
+
 - `addToBasket()` – позволяет добавить товар в корзину.
 - `removeFromBasket()` – позволяет убрать товар из корзины.
 - `clearBasket()` – позволяет очистить корзину.
+- `getBasket()` — возвращает корзину.
+- `calculateTotal()` — вычисляет сумму товаров.
+- `hasItem()`— проверяет наличие товара.
+- `getItemCount()` — возвращает количество товаров.
+
+### OrderModel
+
+**Назначение:** хранение данных заказа.
+
+**Поля:**
+\_payment, \_address, \_email, \_phone.
+
+**Методы:**
+
+- `setOrderData` — устанавливает данные.
+- `getOrder` — возвращает заказ.
+- `clearOrder` — очищает данные.
 
 ### View
 
 #### ModalView
+
 **Назначение:** реализация модального окна.
 
 **Поля:** DOM-элемент для контента, DOM-элемент кнопки.
 
-**Методы:** 
+**Методы:**
+
 - `open()`
 - `close()`
 
 #### CardView
+
 **Назначение:** реализация отображения карточки товара.
 
 **Поля:** DOM-элементы названия товара, категории, изображения, цены, описания, кнпоки.
 
-**Методы:** 
+**Методы:**
+
 - `set title()`
 - `set category()`
 - `set image()`
@@ -190,34 +312,60 @@ interface ISuccessView {
 - `set description()`
 
 #### BasketView
+
 **Назначение:** отображение корзины.
 
 **Поля:** DOM-элемент списка товаров, DOM-элемент итоговой суммы, DOM-элемент кнопки.
 
-**Методы:** 
+**Методы:**
+
 - `set total()`
 - `set items()`
 
 #### FormView
-**Назначение:** отображение форм.
+
+**Назначение:** общий класс для отображения форм.
 
 **Поля:** данные пользователя, DOM-элемент кнопки.
 
 **Методы:**
+
 - `set valid()`
 - `set error()`
 
+#### OrderFormView
+
+**Назначение:** Форма оплаты и адреса.
+
+**Поля:** \_paymentButtons, \_address, \_submitButton, \_errors.
+
+**Методы:**
+`set valid` — управляет кнопкой.
+`set error` — показывает ошибку.
+
+#### ContactsFormView
+
+**Назначение:** Форма контактов.
+
+**Поля:** \_email, \_phone, \_submitButton, \_errors.
+
+**Методы:**
+`set valid` — управляет кнопкой.
+`set error` — показывает ошибку.
+
 #### SuccessView
+
 **Назначение:** отображение окна успешного заказа.
 
 **Поля:** сумма заказа, DOM-элемент кнопки закрытия.
 
 **Методы:**
+
 - `set total()`
 - `close()`
 - `set locked()`
 
 ### Presenter
 
-
 **Назначение:** координация между Model и View. Логика Presenter реализована в index.ts:
+**Реализация:** в index.ts. Используется EventEmitter для обработки событий и управления состоянием интерфейса.

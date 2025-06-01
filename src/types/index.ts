@@ -1,8 +1,8 @@
 // ИНТЕРФЕЙсЫ И ТИПЫ
 
 // ТИПЫ
-type ProductCategory = 'soft-skill' | 'other' | 'additional' | 'button' | 'hard-skill';
-type PaymentMethod = 'online' | 'cash'; 
+type ProductCategory = 'soft' | 'other' | 'additional' | 'button' | 'hard';
+type PaymentMethod = 'card' | 'cash'; 
 
 // ИНТЕРФЕЙСЫ
 

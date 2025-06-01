@@ -20,27 +20,26 @@ export class BasketView extends Component<IBasket> {
     });
   }
 
-  set items(items: IItem[]) {
-    this._list.innerHTML = '';
-    items.forEach((item, index) => {
-      const cardElement = cloneTemplate('#card-basket');
-      const card = new CardView(cardElement, this.events, {
-        onClick: () => {
-          this.events.emit('basket:remove', item);
-        },
-      });
-      card.render({
-        title: item.title,
-        price: item.price,
-      });
-      const indexElement = ensureElement<HTMLElement>('.basket__item-index', cardElement);
-      this.setText(indexElement, index + 1);
-      this._list.append(cardElement);
-    });
-  }
+    set items(items: IItem[]) {
+        this._list.innerHTML = '';
+        items.forEach((item) => {
+            const cardElement = cloneTemplate('#card-basket');
+            const cardView = new CardView(cardElement, this.events, {
+                onClick: () => this.events.emit('basket:remove', item),
+            });
+            cardView.render({
+                ...item,
+                title: item.title,
+                price: item.price,
+            });
+            this._list.append(cardElement);
+        });
 
-  set total(value: number) {
-    this.setText(this._total, `${value} синапсов`);
-    this.setDisabled(this._button, value === 0);
-  }
+        // Отключение кнопки, если корзина пуста
+        this.setDisabled(this._button, !items.length);
+    }
+
+    set total(value: number) {
+        this.setText(this._total, `${value} синапсов`);
+    }
 }
