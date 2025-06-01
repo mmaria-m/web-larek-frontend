@@ -45,7 +45,7 @@ yarn build
 Архитектура основана на паттерне MVP. Т.е. приложение разделено на три слоя: 
 - Model – работает с данными; 
 - View – работает с отображением;
-- Presenter — передает информацию между Model и View.
+- Presenter — передает информацию между Model и View. Логика Presenter находится в index.ts.
 
 ## Типы и интерфесы
 Типы и интерфейсы заданы в src/types/index.ts.
@@ -83,7 +83,7 @@ interface IOrder {
     email: string;
     phone: string;
     address: string;
-    totalPrice: number;
+    total: number;
     items: string[];
 }
 ```
@@ -93,7 +93,7 @@ interface IOrder {
 ```ts
 interface IBasket {
     items: string[];
-    totalPrice: number;
+    total: number;
 
 }
 ```
@@ -112,7 +112,7 @@ interface IForm {
 Данные для окна удачного офорления заказа
 ```ts
 interface ISuccessView {
-    totalPrice: number;
+    total: number;
 }
 ```
 
@@ -137,6 +137,12 @@ interface ISuccessView {
 - `onAll` — добавлят обработчик на все события.
 - `ofAll` — снимает обработчик со всех событий.
 
+#### Component
+**Назначение:** базовый класс для компонентов отображения.
+
+#### Model
+**Назначение:** базовый класс для моделей данных.
+
 ### Model
 
 #### ProductListModel
@@ -153,7 +159,7 @@ interface ISuccessView {
 
 **Поля:** 
 - `items` — хранит массив товаров.
-- `totalPrice` – сумма к оплате.
+- `total` – сумма к оплате.
 
 **Методы:**
 - `addToBasket()` – позволяет добавить товар в корзину.
@@ -201,8 +207,17 @@ interface ISuccessView {
 - `set valid()`
 - `set error()`
 
+#### SuccessView
+**Назначение:** отображение окна успешного заказа.
+
+**Поля:** сумма заказа, DOM-элемент кнопки закрытия.
+
+**Методы:**
+- `set total()`
+- `close()`
+- `set locked()`
+
 ### Presenter
 
-#### AppPresenter
 
-**Назначение:** координация между Model и View.
+**Назначение:** координация между Model и View. Логика Presenter реализована в index.ts:

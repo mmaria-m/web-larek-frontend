@@ -6,6 +6,7 @@ type PaymentMethod = 'online' | 'cash';
 
 // ИНТЕРФЕЙСЫ
 
+// товар
 interface IItem {
     id: string;
     description: string;
@@ -20,13 +21,19 @@ interface IOrder {
     email: string;
     phone: string;
     address: string;
-    totalPrice: number;
+    total: number;
     items: string[];
 }
 
+interface IOrderResult {
+    id: string;
+    total: number;
+}
+
+// корзина
 interface IBasket {
     items: string[];
-    totalPrice: number;
+    total: number;
 }
 
 // интерфейс отображения формы оформления заказа
@@ -39,5 +46,11 @@ interface IForm {
 
 // интерфейс отображения удачного офорления заказа
 interface ISuccessView {
-    totalPrice: number;
+    total: number;
 }
+
+interface ICardActions {
+  onClick: (event: MouseEvent) => void;
+}
+
+export {ProductCategory, PaymentMethod, IItem, IOrder, IOrderResult, IBasket, IForm, ISuccessView, ICardActions}
