@@ -4,27 +4,22 @@ import { WebLarekApi } from '../WebLarekApi';
 import { EventEmitter } from '../base/events';
 
 export class ProductListModel extends Model<IItem> {
-	protected _items: IItem[] = [];
+	protected _productCards: IItem[] = [];
 
 	constructor(data: Partial<IItem>, events: EventEmitter) {
 		super(data, events);
 	}
 
 	set productCards(data: IItem[]) {
-		this._items = data;
-		this.events.emit('items:receive', { items: this._items });
+		this._productCards = data;
+		this.events.emit('items:receive', { items: this._productCards });
 	}
 
-	get items(): IItem[] {
-		return this._items;
-	}
-
-	setProducts(items: IItem[]): void {
-		this._items = items;
-		this.emitChanges('catalog:changed', { items });
+	get productCards(): IItem[] {
+		return this._productCards;
 	}
 
 	getProduct(id: string): IItem | undefined {
-		return this._items.find((item) => item.id === id);
+		return this._productCards.find((item) => item.id === id);
 	}
 }

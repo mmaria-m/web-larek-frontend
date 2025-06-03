@@ -14,6 +14,7 @@ interface IItem {
     title: string; 
     price: number | null;
     category: ProductCategory;
+    index?: number;
 }
 
 interface IOrder {

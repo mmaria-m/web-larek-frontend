@@ -3,43 +3,42 @@ import { IEvents } from '../base/events';
 import { ensureElement, cloneTemplate } from '../../utils/utils';
 import { IItem, IBasket } from '../../types';
 import { CardView } from './CardView';
+import { CardListView } from './CardListView';
 
-export class BasketView extends Component<IBasket> {
-  protected _list: HTMLElement;
-  protected _total: HTMLElement;
-  protected _button: HTMLButtonElement;
+export class BasketView extends Component<HTMLElement> {
+	protected list: HTMLElement;
+	protected totalPrice: HTMLElement;
+	protected button: HTMLButtonElement;
+	protected cardListView: CardListView;
 
-  constructor(container: HTMLElement, protected events: IEvents) {
-    super(container);
-    this._list = ensureElement<HTMLElement>('.basket__list', container);
-    this._total = ensureElement<HTMLElement>('.basket__price', container);
-    this._button = ensureElement<HTMLButtonElement>('.basket__button', container);
+	constructor(container: HTMLElement, protected events: IEvents) {
+		super(container);
+		this.cardListView = new CardListView(events);
+		this.list = ensureElement<HTMLElement>('.basket__list', this.container);
+		this.totalPrice = ensureElement<HTMLElement>(
+			'.basket__price',
+			this.container
+		);
+		this.button = ensureElement<HTMLButtonElement>(
+			'.basket__button',
+			this.container
+		);
 
-    this._button.addEventListener('click', () => {
-      this.events.emit('basket:order');
-    });
-  }
+		this.button.addEventListener('click', () => {
+			this.events.emit('basket:order');
+		});
+	}
 
-    set items(items: IItem[]) {
-        this._list.innerHTML = '';
-        items.forEach((item) => {
-            const cardElement = cloneTemplate('#card-basket');
-            const cardView = new CardView(cardElement, this.events, {
-                onClick: () => this.events.emit('basket:remove', item),
-            });
-            cardView.render({
-                ...item,
-                title: item.title,
-                price: item.price,
-            });
-            this._list.append(cardElement);
-        });
+	set items(items: IItem[]) {
+		this.list.innerHTML = '';
+		const cardElements = items.map((item, index) =>
+			this.cardListView.createCard(item, index)
+		);
+		cardElements.forEach((element) => this.list.append(element));
+		this.setDisabled(this.button, !items.length);
+	}
 
-        // Отключение кнопки, если корзина пуста
-        this.setDisabled(this._button, !items.length);
-    }
-
-    set total(value: number) {
-        this.setText(this._total, `${value} синапсов`);
-    }
+	set total(value: number) {
+		this.setText(this.totalPrice, `${value} синапсов`);
+	}
 }

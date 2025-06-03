@@ -18,6 +18,7 @@ export class CardView extends Component<IItem> {
 	protected _image?: HTMLImageElement;
 	protected _description?: HTMLElement;
 	protected _button?: HTMLButtonElement;
+	protected _index?: HTMLElement;
 
 	constructor(
 		container: HTMLElement,
@@ -26,12 +27,13 @@ export class CardView extends Component<IItem> {
 	) {
 		super(container);
 
-		this._title = ensureElement<HTMLElement>('.card__title', container);
-		this._price = ensureElement<HTMLElement>('.card__price', container);
-		this._category = container.querySelector('.card__category');
-		this._image = container.querySelector('.card__image');
-		this._description = container.querySelector('.card__text');
-		this._button = container.querySelector('.card__button');
+		this._title = ensureElement<HTMLElement>('.card__title', this.container);
+		this._price = ensureElement<HTMLElement>('.card__price', this.container);
+		this._category = this.container.querySelector('.card__category');
+		this._image = this.container.querySelector('.card__image');
+		this._description = this.container.querySelector('.card__text');
+		this._button = this.container.querySelector('.card__button');
+		this._index = this.container.querySelector('.basket__item-index');
 
 		if (this.actions?.onClick) {
 			if (this._button) {
@@ -46,16 +48,8 @@ export class CardView extends Component<IItem> {
 		this.container.dataset.id = value;
 	}
 
-	get id(): string {
-		return this.container.dataset.id || '';
-	}
-
 	set title(value: string) {
 		this.setText(this._title, value);
-	}
-
-	get title(): string {
-		return this._title.textContent || '';
 	}
 
 	set price(value: number | null) {
@@ -90,15 +84,12 @@ export class CardView extends Component<IItem> {
 		}
 	}
 
+	set index(value: string) {
+		this._index.textContent = value;
+	}
+
 	render(data?: Partial<IItem>): HTMLElement {
-		if (data) {
-			if (data.id) this.id = data.id;
-			if (data.title) this.title = data.title;
-			if (data.price !== undefined) this.price = data.price;
-			if (data.category) this.category = data.category;
-			if (data.image) this.image = data.image;
-			if (data.description) this.description = data.description;
-		}
+		super.render(data);
 		return this.container;
 	}
 }

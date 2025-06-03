@@ -28,9 +28,7 @@ export class SuccessView extends Component<HTMLElement> {
 	}
 
 	close(): void {
-		this.container.classList.remove('modal_active');
 		this.setHidden(this.container);
-		this.locked = false;
 		this.events.emit('success:closed');
 	}
 

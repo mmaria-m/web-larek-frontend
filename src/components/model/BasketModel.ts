@@ -2,49 +2,43 @@ import { Model } from '../base/model';
 import { IBasket, IItem } from '../../types';
 import { WebLarekApi } from '../WebLarekApi';
 import { EventEmitter } from '../base/events';
-import { ProductListModel } from './ProductListModel';
 
 export class BasketModel extends Model<IBasket> {
-	protected _items: string[] = [];
-	protected _productListModel: ProductListModel;
+	protected items: IItem[] = [];
 
-	constructor(
-		data: Partial<IBasket>,
-		events: EventEmitter,
-		productListModel: ProductListModel
-	) {
+	constructor(data: IBasket, events: EventEmitter) {
 		super(data, events);
-		this._productListModel = productListModel;
 	}
 
 	addToBasket(item: IItem) {
-		if (!this._items.includes(item.id)) {
-			this._items.push(item.id);
+		if (!this.items.find((i) => i.id === item.id)) {
+			this.items.push(item);
 			this.emitChanges('basket:changed', this.getBasket());
 		}
 	}
 
 	removeFromBasket(item: IItem) {
-		this._items = this._items.filter((id) => id !== item.id);
+		this.items = this.items.filter((i) => i.id !== item.id);
 		this.emitChanges('basket:changed', this.getBasket());
 	}
 
 	clearBasket() {
-		this._items = [];
+		this.items = [];
 		this.emitChanges('basket:changed', this.getBasket());
 	}
 
 	getBasket(): IBasket {
 		return {
-			items: this._items,
+			items: this.items.map((item) => item.id),
 			total: this.calculateTotal(),
 		};
 	}
 
+	getItems(): IItem[] {
+		return this.items;
+	}
+
 	calculateTotal(): number {
-		return this._items.reduce((total, id) => {
-			const item = this._productListModel.items.find((p) => p.id === id);
-			return total + (item?.price ?? 0);
-		}, 0);
+		return this.items.reduce((total, item) => total + (item.price ?? 0), 0);
 	}
 }

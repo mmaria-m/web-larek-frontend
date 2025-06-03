@@ -64,7 +64,13 @@ Presenter подписывается на события, обрабатывае
 
 ## Ключевые события
 
+- items:receive — получение списка товаров.
+
+- card:select — выбор карточки товара.
+
 - catalog:changed — обновление каталога товаров.
+
+- basket:open — открытие корзины.
 
 - basket:changed — изменение корзины.
 
@@ -231,12 +237,13 @@ interface ISuccessView {
 
 **Поля:**
 
-- `items` – хранит массив товаров.
+- `productCards` – хранит массив товаров.
 
 **Методы:**
 
-- `setProducts()` – заполняет массив товаров данными.
-- `getProduct()` - получает товары из модели.
+- `set productCards()` – заполняет массив товаров данными.
+- `get productCards()` – возвращает массив товаров.
+- `getProduct()` – получает товар по id.
 
 #### BasketModel
 
@@ -252,22 +259,28 @@ interface ISuccessView {
 - `removeFromBasket()` – позволяет убрать товар из корзины.
 - `clearBasket()` – позволяет очистить корзину.
 - `getBasket()` — возвращает корзину.
+- `getItems()` — возвращает товары корзины.
 - `calculateTotal()` — вычисляет сумму товаров.
-- `hasItem()`— проверяет наличие товара.
-- `getItemCount()` — возвращает количество товаров.
 
 ### OrderModel
 
 **Назначение:** хранение данных заказа.
 
 **Поля:**
-\_payment, \_address, \_email, \_phone.
+payment, address, email, phone.
 
 **Методы:**
 
-- `setOrderData` — устанавливает данные.
-- `getOrder` — возвращает заказ.
-- `clearOrder` — очищает данные.
+- `setOrderData()` — устанавливает данные.
+- `getOrder()` — возвращает заказ.
+- `clearOrder()` — очищает данные.
+- `isOrderValid()` - проверяет валидность данных оплаты и адреса.
+- `isContactsValid()` - проверяет валидность контактов
+- `isValid()` – проверяет валидность всего заказа.
+- `setPayment()` -  устанавливает метод оплаты.
+- `setAddress()` - устанавливает адрес
+- `setEmail()` - устанавливает email
+- `setPhone()` -  устанавливает телефон
 
 ### View
 
@@ -289,12 +302,15 @@ interface ISuccessView {
 **Поля:** DOM-элементы названия товара, категории, изображения, цены, описания, кнопки.
 
 **Методы:**
+- `set id`
+- `set title `
+- `set category`
+- `set image`
+- `set price`
+- `set description`
+- `set buttonText`
+- `set index`
 
-- `set title()`
-- `set category()`
-- `set image()`
-- `set price()`
-- `set description()`
 
 #### BasketView
 
@@ -325,8 +341,11 @@ interface ISuccessView {
 **Поля:** \_paymentButtons, \_address, \_submitButton, \_errors.
 
 **Методы:**
-`set valid` — управляет кнопкой.
-`set error` — показывает ошибку.
+- `set paymentMethod()`
+- `set address()`
+- `getFormData()`
+- `set valid()`
+- `set error()`
 
 #### ContactsFormView
 
@@ -335,8 +354,11 @@ interface ISuccessView {
 **Поля:** \_email, \_phone, \_submitButton, \_errors.
 
 **Методы:**
-`set valid` — управляет кнопкой.
-`set error` — показывает ошибку.
+- `set email()`
+- `set phone()`
+- `getFormData()`
+- `set valid()`
+- `set error()`
 
 #### SuccessView
 
@@ -349,6 +371,29 @@ interface ISuccessView {
 - `set total()`
 - `close()`
 - `set locked()`
+
+#### GalleryView
+**Назначение:** отображение каталога товаров.
+
+**Поля:** DOM-элемент контейнера.
+
+**Методы:**
+- `set items()` 
+
+#### CardListView
+
+**Назначение:**  отображение списка карточек товаров.
+
+**Методы:**
+`createCard()`
+
+#### HeaderView
+**Назначение:** отображение шапки сайта.
+
+**Поля:** DOM-элементы корзины и счетчика товаров.
+
+**Методы:**
+`set counterValue()` — отображает количество товаров в корзине.
 
 ### Presenter
 
