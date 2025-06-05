@@ -1,22 +1,19 @@
 import { Model } from '../base/model';
 import { IOrder, IForm, PaymentMethod } from '../../types';
 import { EventEmitter } from '../base/events';
-import { BasketModel } from './BasketModel';
 
 export class OrderModel extends Model<IOrder> {
 	protected payment: string | undefined;
 	protected address: string | undefined;
 	protected email: string | undefined;
 	protected phone: string | undefined;
-	private basket: BasketModel;
 
-	constructor(data: IOrder, events: EventEmitter, basket: BasketModel) {
+	constructor(data: Partial<IOrder>, events: EventEmitter) {
 		super(data, events);
 		this.payment = data.payment;
 		this.address = data.address;
 		this.email = data.email;
 		this.phone = data.phone;
-		this.basket = basket;
 	}
 
 	setPayment(value: PaymentMethod) {
@@ -39,15 +36,12 @@ export class OrderModel extends Model<IOrder> {
 		this.emitChanges('contacts:changed');
 	}
 
-	getOrder(): IOrder {
-		const { items, total } = this.basket.getBasket();
+	getOrder(): Partial<IOrder> {
 		return {
-			payment: (this.payment || '') as PaymentMethod,
+			payment: this.payment as PaymentMethod,
 			address: this.address || '',
 			email: this.email || '',
 			phone: this.phone || '',
-			items,
-			total,
 		};
 	}
 

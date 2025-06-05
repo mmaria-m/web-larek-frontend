@@ -3,10 +3,10 @@ import { IBasket, IItem } from '../../types';
 import { WebLarekApi } from '../WebLarekApi';
 import { EventEmitter } from '../base/events';
 
-export class BasketModel extends Model<IBasket> {
+export class BasketModel extends Model<{ items: IItem[] }> {
 	protected items: IItem[] = [];
 
-	constructor(data: IBasket, events: EventEmitter) {
+	constructor(data: { items: IItem[] }, events: EventEmitter) {
 		super(data, events);
 	}
 

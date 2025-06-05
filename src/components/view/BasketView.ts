@@ -1,19 +1,15 @@
 import { Component } from '../base/components';
 import { IEvents } from '../base/events';
-import { ensureElement, cloneTemplate } from '../../utils/utils';
-import { IItem, IBasket } from '../../types';
-import { CardView } from './CardView';
-import { CardListView } from './CardListView';
+import { ensureElement } from '../../utils/utils';
+import { IBasket } from '../../types';
 
-export class BasketView extends Component<HTMLElement> {
+export class BasketView extends Component<IBasket> {
 	protected list: HTMLElement;
 	protected totalPrice: HTMLElement;
 	protected button: HTMLButtonElement;
-	protected cardListView: CardListView;
 
 	constructor(container: HTMLElement, protected events: IEvents) {
 		super(container);
-		this.cardListView = new CardListView(events);
 		this.list = ensureElement<HTMLElement>('.basket__list', this.container);
 		this.totalPrice = ensureElement<HTMLElement>(
 			'.basket__price',
@@ -29,13 +25,10 @@ export class BasketView extends Component<HTMLElement> {
 		});
 	}
 
-	set items(items: IItem[]) {
+	set items(elements: HTMLElement[]) {
 		this.list.innerHTML = '';
-		const cardElements = items.map((item, index) =>
-			this.cardListView.createCard(item, index)
-		);
-		cardElements.forEach((element) => this.list.append(element));
-		this.setDisabled(this.button, !items.length);
+		elements.forEach((element) => this.list.append(element));
+		this.setDisabled(this.button, !elements.length);
 	}
 
 	set total(value: number) {

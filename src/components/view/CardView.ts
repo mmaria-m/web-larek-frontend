@@ -39,7 +39,7 @@ export class CardView extends Component<IItem> {
 			if (this._button) {
 				this._button.addEventListener('click', this.actions.onClick);
 			} else {
-				container.addEventListener('click', this.actions.onClick);
+				this.container.addEventListener('click', this.actions.onClick);
 			}
 		}
 	}
@@ -86,10 +86,5 @@ export class CardView extends Component<IItem> {
 
 	set index(value: string) {
 		this._index.textContent = value;
-	}
-
-	render(data?: Partial<IItem>): HTMLElement {
-		super.render(data);
-		return this.container;
 	}
 }

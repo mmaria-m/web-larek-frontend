@@ -11,9 +11,9 @@ export abstract class FormView extends Component<IForm> {
 		super(container);
 		this._submitButton = ensureElement<HTMLButtonElement>(
 			'.button[type="submit"]',
-			container
+			this.container
 		);
-		this._errors = ensureElement<HTMLElement>('.form__errors', container);
+		this._errors = ensureElement<HTMLElement>('.form__errors', this.container);
 	}
 
 	set valid(value: boolean) {
@@ -36,11 +36,11 @@ export class OrderFormView extends FormView {
 	constructor(container: HTMLElement, events: IEvents) {
 		super(container, events);
 		this._paymentButtons = Array.from(
-			container.querySelectorAll('.button_alt')
+			this.container.querySelectorAll('.button_alt')
 		) as HTMLButtonElement[];
 		this._address = ensureElement<HTMLInputElement>(
 			'.form__input[name="address"]',
-			container
+			this.container
 		);
 
 		this._paymentButtons.forEach((button) => {
@@ -89,11 +89,11 @@ export class ContactsFormView extends FormView {
 		super(container, events);
 		this._email = ensureElement<HTMLInputElement>(
 			'.form__input[name="email"]',
-			container
+			this.container
 		);
 		this._phone = ensureElement<HTMLInputElement>(
 			'.form__input[name="phone"]',
-			container
+			this.container
 		);
 
 		this._email.addEventListener('input', () => {
